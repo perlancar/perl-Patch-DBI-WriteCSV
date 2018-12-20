@@ -125,7 +125,10 @@ sub unimport {
 
  {
      Patch::DBI::WriteCSV->import; # start writing CSV
-     $dbh->selectrow_texttable("SELECT * FROM member");
+     my $sth = $dbh->prepare("SELECT * FROM member");
+     while (my $row = $sth->fetchrow_hashref) {
+         # do something with $row
+     }
      Patch::DBI::WriteCSV->unimport; # no longer write CSV
  }
 
@@ -149,6 +152,10 @@ This package patches the following L<DBI> methods:
 
 to also write CSV while fetching row(s). By default it writes to STDOUT but this
 can be customized (see L</IMPORTS>).
+
+Compared to solution like L<DBIx::CSV>, this solution does not introduce new
+methods to DBI's database/statement handle, so producing CSV can be easier when
+you do not use DBI directly, like when you use L<DBIx::Class>.
 
 
 =head1 IMPORTS
